@@ -4,16 +4,16 @@ import socket
 import concurrent.futures
 import threading
 
-ipGen2 = '10.121.3.180' #Versiontest GW - Gen2 MS
-portsGen2 = [21, 22, 80, 443] #22 open only on versiontest for debugging
+ipGen2 = '10.121.4.180' #Versiontest GW - Gen2 MS
+portsGen2 = [21, 80, 443] #22 open only on versiontest for debugging
 portsGen2udp = []
-ipGen1 = '10.121.3.181' #Versiontest client 1 - Gen1 MS
+ipGen1 = '10.121.4.181' #Versiontest client 1 - Gen1 MS
 portsGen1 = [21, 80, 443]
 portsGen1udp = []
-ipCompact = '10.121.3.185' #Versiontest client 5 - Compact
-portsCompact = [21, 22, 80, 139, 443, 445, 7090, 7091, 7092, 7094, 7095] #22 open only on versiontest for debugging
+ipCompact = '10.121.4.185' #Versiontest client 5 - Compact
+portsCompact = [21, 80, 139, 443, 445, 7090, 7091, 7092, 7094, 7095] #22 open only on versiontest for debugging
 portsCompactudp = []
-timeout = 0.015 #Timeout for packets (15ms)
+timeout = 0.030 #Timeout for packets (30ms)
 
 def app_check():
     file_path = r"C:\Users\Honza_Lox\Downloads\lxcommunicator-master\test\index.html"
@@ -115,7 +115,7 @@ def scan_udp_port(target_ip, port, lock):
 def check_ports(target_ip, tcp_ports, udp_ports, compact):
     min_port = 1
     max_port = 65535
-    allowedTCP_ports = tcp_ports.copy()
+    allowedTCP_ports = tcp_ports.copy() + [22]
     allowedUDP_ports = udp_ports.copy() + [5353]
     if compact:
         allowedTCP_ports += [7097] + list(range(10000, 65535))
@@ -130,6 +130,7 @@ def check_ports(target_ip, tcp_ports, udp_ports, compact):
     with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
         # TCP port scanning
         print(f"Checking TCP ports {min_port} to {max_port}")
+        print(f"Open ports should be: {tcp_ports}")
         futures_tcp = {executor.submit(scan_tcp_port, target_ip, port, lock): port for port in range(min_port, max_port)}
         for future in concurrent.futures.as_completed(futures_tcp):
             result = future.result()
@@ -138,6 +139,7 @@ def check_ports(target_ip, tcp_ports, udp_ports, compact):
 
         # UDP port scanning
         print(f"Checking UDP ports {min_port} to {max_port}")
+        print(f"Open ports should be: {udp_ports}")
         futures_udp = {executor.submit(scan_udp_port, target_ip, port, lock): port for port in range(min_port, max_port)}
         for future in concurrent.futures.as_completed(futures_udp):
             result = future.result()
