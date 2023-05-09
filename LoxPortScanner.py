@@ -11,7 +11,7 @@ ipGen1 = '10.121.4.181' #Versiontest client 1 - Gen1 MS
 portsGen1 = [21, 80, 443]
 portsGen1udp = []
 ipCompact = '10.121.4.185' #Versiontest client 5 - Compact
-portsCompact = [21, 80, 139, 443, 445, 7090, 7091, 7092, 7094, 7095] #22 open only on versiontest for debugging
+portsCompact = [21, 80, 139, 443, 445, 7090] #22 open only on versiontest for debugging
 portsCompactudp = []
 timeout = 0.030 #Timeout for packets (30ms)
 
@@ -118,7 +118,7 @@ def check_ports(target_ip, tcp_ports, udp_ports, compact):
     allowedTCP_ports = tcp_ports.copy() + [22]
     allowedUDP_ports = udp_ports.copy() + [5353]
     if compact:
-        allowedTCP_ports += [7097] + list(range(10000, 65535))
+        allowedTCP_ports += [7091,7092,7093,7094,7095,7097] + list(range(10000, 65535))
         allowedUDP_ports += [137] + list(range(10000, 65535))
     open_tcp_ports = []
     open_udp_ports = []
